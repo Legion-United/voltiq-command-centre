@@ -4,6 +4,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { brand } from "@/lib/data";
 import ThemeToggle from "./ThemeToggle";
+import BootScreen from "./BootScreen";
+import { ToastProvider } from "./interactive";
 import {
   Bolt, Home, Map, Calendar, Layers, User, Doc, Cash, Package, Vault, Workforce, Brain,
   Search, Bell, Menu,
@@ -48,14 +50,24 @@ function useClock() {
   return t;
 }
 
+const NOTIFS = [
+  { t: "Emergency: power loss at Redcliffe office", w: "now", tone: "co" },
+  { t: "Bath Park & Ride accepted the £41.2k EV quote", w: "3 h ago", tone: "g" },
+  { t: "EV chargers below minimum — PO-4469 awaiting approval", w: "today", tone: "y" },
+];
+
 export default function DashShell({ children }: { children: React.ReactNode }) {
   const path = usePathname();
   const [open, setOpen] = React.useState(false);
+  const [notif, setNotif] = React.useState(false);
+  const [q, setQ] = React.useState("");
   const clock = useClock();
 
   if (path === "/") return <>{children}</>;
 
   return (
+    <ToastProvider>
+    <BootScreen />
     <div className="shell">
       <div className={`scrim ${open ? "show" : ""}`} onClick={() => setOpen(false)} />
       <aside className={`rail ${open ? "open" : ""}`}>
@@ -103,20 +115,39 @@ export default function DashShell({ children }: { children: React.ReactNode }) {
             <span className="sep">/</span>
             <b>{CRUMBS[path] || ""}</b>
           </div>
-          <div className="searchbox">
+          <form className="searchbox" onSubmit={(e) => e.preventDefault()}>
             <Search />
-            <span>Search crews, jobs, clients…</span>
+            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search crews, jobs, clients…" style={{ border: "none", background: "transparent", outline: "none", width: "100%", color: "inherit", font: "inherit" }} />
             <kbd>⌘K</kbd>
-          </div>
+          </form>
           <div className="top-right">
             <span className="pill line tiny" style={{ gap: 6 }}><span className="dot g pulse" /> LEGION OS online</span>
             <span className="tiny muted mono" style={{ minWidth: 40 }}>{clock}</span>
-            <button className="iconbtn dot-badge" aria-label="Notifications"><Bell /></button>
+            <div style={{ position: "relative" }}>
+              <button className={`iconbtn ${notif ? "" : "dot-badge"}`} aria-label="Notifications" onClick={() => setNotif((v) => !v)}><Bell /></button>
+              {notif ? (
+                <>
+                  <div style={{ position: "fixed", inset: 0, zIndex: 49 }} onClick={() => setNotif(false)} />
+                  <div className="card" style={{ position: "absolute", right: 0, top: 42, width: 320, zIndex: 50, boxShadow: "var(--shadow-lg)" }}>
+                    <div className="card-h" style={{ padding: "12px 15px" }}><h3 style={{ fontSize: 13 }}>Notifications</h3><span className="right tiny muted">3 new</span></div>
+                    <div style={{ padding: 8 }}>
+                      {NOTIFS.map((n, i) => (
+                        <div key={i} className="row" style={{ gap: 10, padding: "9px 8px", borderRadius: 8, alignItems: "flex-start" }}>
+                          <span className={`dot ${n.tone}`} style={{ marginTop: 5 }} />
+                          <div><div style={{ fontSize: 12.5 }}>{n.t}</div><div className="tiny muted">{n.w}</div></div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              ) : null}
+            </div>
             <ThemeToggle />
           </div>
         </header>
         <main className="content">{children}</main>
       </div>
     </div>
+    </ToastProvider>
   );
 }

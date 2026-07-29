@@ -1,19 +1,32 @@
 "use client";
+import * as React from "react";
 import { PageHead, Card, Pill, Stat, Meter } from "@/components/ui";
 import { eur } from "@/components/ui";
 import { projects, stageCounts } from "@/lib/data";
+import type { Project } from "@/lib/data";
 import { Layers, Plus, Bolt, Wrench } from "@/components/icons";
+import { useToast, Drawer, Modal, Segmented } from "@/components/interactive";
 
 const healthTone: Record<string, "g" | "y" | "co"> = { g: "g", y: "y", r: "co" };
 const healthText: Record<string, string> = { g: "On track", y: "Watch", r: "At risk" };
+const FILTERS = ["All", "On track", "At risk"] as const;
 
 export default function ProjectsPage() {
+  const toast = useToast();
   const total = projects.reduce((a, p) => a + p.value, 0);
+  const [filter, setFilter] = React.useState<string>("All");
+  const [active, setActive] = React.useState<Project | null>(null);
+  const [creating, setCreating] = React.useState(false);
+
+  const shown = projects.filter((p) =>
+    filter === "All" ? true : filter === "On track" ? p.health === "g" : p.health !== "g"
+  );
+
   return (
     <>
       <PageHead eyebrow="The Coordinator" title="Projects" sub="Every live project across the firm, each on the same eight-stage journey. When one stage slows, the board shows it before it becomes a problem.">
         <span className="pill line">{projects.length} shown · {eur(total)}</span>
-        <button className="btn primary"><Plus /> New project</button>
+        <button className="btn primary" onClick={() => setCreating(true)}><Plus /> New project</button>
       </PageHead>
 
       <Card title="Pipeline by stage" sub="37 jobs across 8 stages" icon={<Layers width={17} height={17} />} style={{ marginBottom: 16 }}>
@@ -32,9 +45,14 @@ export default function ProjectsPage() {
         </div>
       </Card>
 
+      <div className="spread" style={{ marginBottom: 12 }}>
+        <span className="tiny muted">{shown.length} of {projects.length} projects</span>
+        <Segmented options={[...FILTERS]} value={filter} onChange={setFilter} />
+      </div>
+
       <div className="grid g-2">
-        {projects.map((p) => (
-          <div className="card pad" key={p.id}>
+        {shown.map((p) => (
+          <div className="card pad clickable" key={p.id} onClick={() => setActive(p)}>
             <div className="spread" style={{ alignItems: "flex-start" }}>
               <div>
                 <div className="row" style={{ gap: 8 }}>
@@ -60,11 +78,72 @@ export default function ProjectsPage() {
               <div className="stackrow">
                 {p.crew.map((c) => <span key={c} className="avatar sm">{c}</span>)}
               </div>
-              <button className="btn sm ghost"><Wrench width={13} height={13} /> Open</button>
+              <button className="btn sm ghost" onClick={(e) => { e.stopPropagation(); setActive(p); }}><Wrench width={13} height={13} /> Open</button>
             </div>
           </div>
         ))}
       </div>
+
+      <Drawer
+        open={!!active}
+        onClose={() => setActive(null)}
+        title={active?.name}
+        sub={active ? `${active.id} · ${active.client}` : undefined}
+        footer={active ? (
+          <>
+            <button className="btn primary sm" onClick={() => { toast(`${active.name} advanced to stage ${Math.min(8, active.stage + 1)}`, "g"); setActive(null); }}>Advance stage</button>
+            <button className="btn sm" onClick={() => { toast("Project files opened in the Vault", "b"); setActive(null); }}>Open files</button>
+          </>
+        ) : null}
+      >
+        {active ? (
+          <div className="stack" style={{ gap: 14 }}>
+            <div className="kv"><span className="k">Client</span><span className="v">{active.client}</span></div>
+            <div className="kv"><span className="k">Value</span><span className="v">{eur(active.value)}</span></div>
+            <div className="kv"><span className="k">Stage</span><span className="v">{active.stage}/8 · {active.stageName}</span></div>
+            <div className="kv"><span className="k">Crew</span><span className="v">{active.crew.join(", ")}</span></div>
+            <div className="kv"><span className="k">Due</span><span className="v">{active.due}</span></div>
+            <div className="kv"><span className="k">Health</span><span className="v"><Pill tone={healthTone[active.health]}>{healthText[active.health]}</Pill></span></div>
+            <div><div className="spread" style={{ marginBottom: 6 }}><span className="tiny muted">Progress</span><span className="tiny muted tnum">{active.progress}%</span></div><Meter value={active.progress} variant={active.health === "r" ? "r" : active.health === "y" ? "y" : "volt"} /></div>
+            <div>
+              <div className="tiny muted" style={{ marginBottom: 8, fontWeight: 640 }}>Eight-stage journey</div>
+              <div className="stack" style={{ gap: 8 }}>
+                {stageCounts.map((s) => (
+                  <div key={s.idx} className="row" style={{ gap: 9 }}>
+                    <span className={`dot ${s.idx < active.stage ? "g" : s.idx === active.stage ? "b" : ""}`} style={s.idx > active.stage ? { background: "var(--surface-3)" } : undefined} />
+                    <span className="tiny" style={{ fontWeight: s.idx === active.stage ? 640 : 400, opacity: s.idx > active.stage ? .55 : 1 }}>{s.idx}. {s.name}</span>
+                    {s.idx < active.stage ? <span className="tiny muted" style={{ marginLeft: "auto" }}>done</span> : s.idx === active.stage ? <span className="tiny" style={{ marginLeft: "auto", color: "var(--cobalt)" }}>current</span> : null}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        ) : null}
+      </Drawer>
+
+      <Modal
+        open={creating}
+        onClose={() => setCreating(false)}
+        title="New project"
+        sub="Add a project to the eight-stage pipeline"
+        wide
+        footer={
+          <>
+            <button className="btn sm" onClick={() => setCreating(false)}>Cancel</button>
+            <button className="btn primary sm" onClick={() => { toast("Project created — added at stage 1", "g"); setCreating(false); }}>Create project</button>
+          </>
+        }
+      >
+        <div className="stack" style={{ gap: 13 }}>
+          <label className="stack" style={{ gap: 5 }}><span className="tiny muted">Project name</span><input className="input" placeholder="e.g. Clifton surgery refit" /></label>
+          <label className="stack" style={{ gap: 5 }}><span className="tiny muted">Client</span><input className="input" placeholder="Client or company" /></label>
+          <div className="row" style={{ gap: 10 }}>
+            <label className="stack grow" style={{ gap: 5 }}><span className="tiny muted">Estimated value</span><input className="input" placeholder="£" /></label>
+            <label className="stack grow" style={{ gap: 5 }}><span className="tiny muted">Target completion</span><input className="input" placeholder="e.g. 30 Aug" /></label>
+          </div>
+          <label className="stack" style={{ gap: 5 }}><span className="tiny muted">Lead engineer</span><input className="input" placeholder="Assign a crew lead" /></label>
+        </div>
+      </Modal>
     </>
   );
 }

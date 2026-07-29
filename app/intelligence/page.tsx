@@ -1,6 +1,8 @@
 "use client";
+import * as React from "react";
 import { PageHead, Card, Pill } from "@/components/ui";
 import { Brain, Route, Chart, Package, Doc, Send, Bolt, Shield, Check } from "@/components/icons";
+import { useToast } from "@/components/interactive";
 
 const PROMPTS = [
   { icon: "route", t: "Which crews have slack on Thursday?" },
@@ -14,6 +16,14 @@ const PI: Record<string, React.ReactNode> = {
 };
 
 export default function IntelligencePage() {
+  const toast = useToast();
+  const [msg, setMsg] = React.useState("");
+
+  const send = () => {
+    toast(msg.trim() ? `Added to workspace: “${msg.trim()}”` : "Added to workspace", "g");
+    setMsg("");
+  };
+
   return (
     <>
       <PageHead eyebrow="Intelligence" title="Your private AI bench" sub="A secure workspace for the whole firm, grounded in your jobs, crews and documents. Nothing leaves the business.">
@@ -33,16 +43,25 @@ export default function IntelligencePage() {
               <div style={{ background: "var(--surface-2)", border: "1px solid var(--line)", padding: "12px 14px", borderRadius: "12px 12px 12px 3px", fontSize: 13, maxWidth: "82%" }}>
                 <p style={{ marginBottom: 8 }}>Callum Reid is closest, 6 minutes out, and holds 3-phase and fault-finding. Liam is already on site but at 95% utilisation today. I have flagged Callum for dispatch.</p>
                 <div className="row" style={{ gap: 8, marginTop: 4 }}>
-                  <button className="btn primary sm"><Send width={13} height={13} /> Dispatch Callum</button>
-                  <button className="btn ghost sm">See both</button>
+                  <button className="btn primary sm" onClick={() => toast("Callum dispatched to the Redcliffe emergency", "g")}><Send width={13} height={13} /> Dispatch Callum</button>
+                  <button className="btn ghost sm" onClick={() => toast("Showing both crews side by side", "b")}>See both</button>
                   <Pill tone="c">Live from Dispatch</Pill>
                 </div>
               </div>
             </div>
           </div>
           <div className="row" style={{ gap: 8, marginTop: 18 }}>
-            <div className="searchbox" style={{ flex: 1, minWidth: 0 }}><Brain width={15} height={15} /><span>Ask about crews, jobs, cash or the regs…</span></div>
-            <button className="btn primary"><Send width={15} height={15} /></button>
+            <div className="searchbox" style={{ flex: 1, minWidth: 0 }}>
+              <Brain width={15} height={15} />
+              <input
+                value={msg}
+                onChange={(e) => setMsg(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter") send(); }}
+                placeholder="Ask about crews, jobs, cash or the regs…"
+                style={{ border: "none", background: "transparent", outline: "none", width: "100%", color: "inherit", font: "inherit" }}
+              />
+            </div>
+            <button className="btn primary" onClick={send}><Send width={15} height={15} /></button>
           </div>
         </Card>
 
@@ -50,7 +69,7 @@ export default function IntelligencePage() {
           <Card title="Quick starts" icon={<Bolt width={17} height={17} />}>
             <div className="stack" style={{ gap: 9 }}>
               {PROMPTS.map((p, i) => (
-                <button key={i} className="row" style={{ gap: 11, padding: "11px 12px", border: "1px solid var(--line)", borderRadius: 10, background: "var(--surface-2)", textAlign: "left", width: "100%" }}>
+                <button key={i} className="row" style={{ gap: 11, padding: "11px 12px", border: "1px solid var(--line)", borderRadius: 10, background: "var(--surface-2)", textAlign: "left", width: "100%" }} onClick={() => toast(`Added to workspace: “${p.t}”`, "g")}>
                   <span className="avatar sm" style={{ background: "var(--cyan-soft)", color: "var(--cyan-ink)", borderColor: "transparent" }}>{PI[p.icon]}</span>
                   <span style={{ fontSize: 12.5, fontWeight: 550 }}>{p.t}</span>
                 </button>

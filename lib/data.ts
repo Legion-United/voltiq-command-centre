@@ -36,7 +36,7 @@ export const kpis = {
 
 /* ---------------- Technicians / crews ---------------- */
 export type Tech = {
-  id: string; name: string; initials: string; role: string; status: "On job" | "In transit" | "Idle" | "Off";
+  id: string; name: string; initials: string; role: string; status: "On job" | "In transit" | "Idle" | "Off" | "Alert";
   job?: string; place: string; skills: string[]; util: number; jobsToday: number; van: string;
   x: number; y: number; kind: "job" | "transit" | "alert" | "idle"; eta?: string;
 };

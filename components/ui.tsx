@@ -41,7 +41,7 @@ export function Card({ title, sub, right, icon, children, pad, className, style 
 export function Stat({ label, value, unit, delta, deltaDir, icon, spark, variant }: {
   label: string; value: string | number; unit?: string;
   delta?: string; deltaDir?: "up" | "down" | "flat"; icon?: React.ReactNode;
-  spark?: number[]; variant?: "accent" | "volt";
+  spark?: number[]; variant?: "accent" | "volt" | "cyan";
 }) {
   return (
     <div className={`stat ${variant || ""}`}>
@@ -59,7 +59,7 @@ export function Stat({ label, value, unit, delta, deltaDir, icon, spark, variant
 }
 
 /* ---------------- Meter ---------------- */
-export function Meter({ value, variant }: { value: number; variant?: "volt" | "g" | "y" | "r" }) {
+export function Meter({ value, variant }: { value: number; variant?: "volt" | "g" | "y" | "r" | "c" }) {
   return <div className="meter"><span className={variant || ""} style={{ width: `${Math.max(0, Math.min(100, value))}%` }} /></div>;
 }
 
@@ -133,7 +133,7 @@ export function AreaChart({ data, h = 180, color = "var(--cobalt)", labels }: { 
 }
 
 /* ---------------- Pill / Dot ---------------- */
-export function Pill({ tone, children }: { tone?: "b" | "g" | "y" | "r" | "v" | "line"; children: React.ReactNode }) {
+export function Pill({ tone, children }: { tone?: "b" | "g" | "y" | "r" | "v" | "line" | "c" | "co"; children: React.ReactNode }) {
   return <span className={`pill ${tone || ""}`}>{children}</span>;
 }
 export function Dot({ tone, pulse }: { tone: "g" | "y" | "r" | "b"; pulse?: boolean }) {

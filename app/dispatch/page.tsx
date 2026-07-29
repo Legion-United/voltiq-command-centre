@@ -3,6 +3,9 @@ import * as React from "react";
 import { PageHead, Card, Pill, Avatar, Stat } from "@/components/ui";
 import { techs, dispatch } from "@/lib/data";
 import { Map, Truck, Route, Warn, Bolt, Wrench, Pin, ArrowRight } from "@/components/icons";
+import { useToast, Drawer } from "@/components/interactive";
+
+type Feed = (typeof dispatch)[number];
 
 const kindIcon: Record<string, React.ReactNode> = {
   job: <Wrench width={16} height={16} />, transit: <Truck width={16} height={16} />,
@@ -16,13 +19,15 @@ const feedTone: Record<string, React.CSSProperties> = {
 };
 
 export default function DispatchPage() {
+  const toast = useToast();
   const [sel, setSel] = React.useState<string | null>("T3");
+  const [feed, setFeed] = React.useState<Feed | null>(null);
   const active = techs.find((t) => t.id === sel);
   return (
     <>
       <PageHead eyebrow="The Dispatcher" title="Live dispatch" sub="Every van, every job, in real time. When the emergency comes in, the nearest qualified engineer is already on the way.">
         <span className="pill co"><span className="dot co pulse" /> 1 emergency</span>
-        <button className="btn primary"><Route /> Optimise routes</button>
+        <button className="btn primary" onClick={() => toast("Routes optimised — 3.4 hrs of travel saved today", "g")}><Route /> Optimise routes</button>
       </PageHead>
 
       <div className="grid g-4" style={{ marginBottom: 16 }}>
@@ -67,8 +72,8 @@ export default function DispatchPage() {
                 {active.skills.map((s) => <Pill key={s} tone="line">{s}</Pill>)}
               </div>
               <div className="row" style={{ gap: 8, marginTop: 14 }}>
-                <button className="btn primary sm">Message crew</button>
-                <button className="btn sm">Reassign <ArrowRight width={13} height={13} /></button>
+                <button className="btn primary sm" onClick={() => toast(`Message sent to ${active.name.split(" ")[0]}`, "g")}>Message crew</button>
+                <button className="btn sm" onClick={() => toast(`Reassignment options opened for ${active.name.split(" ")[0]}`, "b")}>Reassign <ArrowRight width={13} height={13} /></button>
               </div>
             </Card>
           ) : null}
@@ -76,7 +81,7 @@ export default function DispatchPage() {
           <Card title="Dispatch feed" sub="Live" icon={<Bolt width={17} height={17} />}>
             <div className="stack" style={{ gap: 10 }}>
               {dispatch.map((d, i) => (
-                <div key={i} className="row" style={{ gap: 10, alignItems: "flex-start" }}>
+                <div key={i} className="row clickable" style={{ gap: 10, alignItems: "flex-start" }} onClick={() => setFeed(d)}>
                   <span className="avatar sm" style={{ ...feedTone[d.tone], borderColor: "transparent" }}><Route width={14} height={14} /></span>
                   <div className="grow">
                     <div style={{ fontSize: 12.5, fontWeight: 600 }}>{d.t}</div>
@@ -89,6 +94,34 @@ export default function DispatchPage() {
           </Card>
         </div>
       </div>
+
+      <Drawer
+        open={!!feed}
+        onClose={() => setFeed(null)}
+        title="Dispatch event"
+        sub={feed?.when}
+        footer={feed ? (
+          <>
+            <button className="btn primary sm" onClick={() => { toast("Acknowledged — crews notified", "g"); setFeed(null); }}>Acknowledge</button>
+            <button className="btn sm" onClick={() => { toast("Event muted for 30 min", "y"); setFeed(null); }}>Mute</button>
+          </>
+        ) : null}
+      >
+        {feed ? (
+          <div className="stack" style={{ gap: 12 }}>
+            <div style={{ fontSize: 14, fontWeight: 640 }}>{feed.t}</div>
+            <div className="tiny muted">{feed.meta}</div>
+            <div>
+              <div className="tiny muted" style={{ marginBottom: 8, fontWeight: 640 }}>Timeline</div>
+              <div className="stack" style={{ gap: 9 }}>
+                <div className="row" style={{ gap: 9 }}><span className="dot b" /><span className="tiny">Detected by the Coordinator</span></div>
+                <div className="row" style={{ gap: 9 }}><span className="dot c" /><span className="tiny">Nearest qualified crew identified</span></div>
+                <div className="row" style={{ gap: 9 }}><span className="dot g" /><span className="tiny">Pushed to the live feed {feed.when}</span></div>
+              </div>
+            </div>
+          </div>
+        ) : null}
+      </Drawer>
     </>
   );
 }
