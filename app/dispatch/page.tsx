@@ -18,6 +18,16 @@ const feedTone: Record<string, React.CSSProperties> = {
   y: { background: "var(--warn-soft)", color: "#8a5a12" },
 };
 
+const AREAS = [
+  { n: "Gloucester Rd", x: 31, y: 11 },
+  { n: "Clifton", x: 13, y: 45 },
+  { n: "City Centre", x: 64, y: 44 },
+  { n: "Redcliffe", x: 43, y: 67 },
+  { n: "Bedminster", x: 21, y: 90 },
+  { n: "Knowle", x: 72, y: 83 },
+  { n: "→ Bath", x: 91, y: 57 },
+];
+
 export default function DispatchPage() {
   const toast = useToast();
   const [sel, setSel] = React.useState<string | null>("T3");
@@ -41,14 +51,26 @@ export default function DispatchPage() {
         <Card title="Bristol & Bath — live" sub="Tap a pin to see the crew" icon={<Map width={17} height={17} />} pad={false}>
           <div className="opsmap">
             <div className="opsmap-grid" />
-            <svg className="maproute" viewBox="0 0 100 100" preserveAspectRatio="none">
-              <path d="M49 50 L52 58" stroke="var(--coral)" strokeWidth="0.6" strokeDasharray="1.5 1.5" fill="none" opacity="0.8" />
-              <path d="M74 66 L88 74" stroke="var(--cyan)" strokeWidth="0.6" strokeDasharray="1.5 1.5" fill="none" opacity="0.7" />
+            <svg className="maproads" viewBox="0 0 100 100" preserveAspectRatio="none">
+              <path d="M6 28 C 28 22, 44 40, 62 30 S 92 24, 100 33" />
+              <path d="M22 4 C 26 32, 40 50, 33 78 S 40 96, 30 100" />
+              <path d="M0 60 C 28 56, 52 66, 72 60 S 96 66, 100 61" />
+              <path d="M54 2 C 50 28, 56 52, 52 74 S 62 92, 70 100" />
             </svg>
+            <svg className="maproute" viewBox="0 0 100 100" preserveAspectRatio="none">
+              <path d="M42 52 L52 58" stroke="var(--coral)" strokeWidth="0.7" strokeDasharray="1.6 1.6" fill="none" opacity="0.9" />
+              <path d="M74 66 L88 74" stroke="var(--cyan)" strokeWidth="0.7" strokeDasharray="1.6 1.6" fill="none" opacity="0.8" />
+            </svg>
+            {AREAS.map((a) => (
+              <span key={a.n} className="maparea" style={{ left: `${a.x}%`, top: `${a.y}%` }}>{a.n}</span>
+            ))}
             {techs.map((t) => (
-              <button key={t.id} className={`mappin ${t.kind}`} style={{ left: `${t.x}%`, top: `${t.y}%`, background: "none", border: "none", padding: 0 }} onClick={() => setSel(t.id)}>
-                {sel === t.id ? <span className="lbl">{t.name.split(" ")[0]} · {t.status}</span> : null}
+              <button key={t.id} className={`mappin ${t.kind} ${sel === t.id ? "sel" : ""}`} style={{ left: `${t.x}%`, top: `${t.y}%`, background: "none", border: "none", padding: 0 }} onClick={() => setSel(t.id)}>
                 <span className="glyph">{(t.kind === "alert" || t.kind === "transit") ? <span className="ping" /> : null}{kindIcon[t.kind]}</span>
+                <span className="cap">
+                  <b>{t.name.split(" ")[0]}</b>
+                  <span>{sel === t.id ? t.status : t.eta ? t.eta : `${t.util}% util`}</span>
+                </span>
               </button>
             ))}
             <div style={{ position: "absolute", left: 14, bottom: 14, display: "flex", gap: 12, flexWrap: "wrap", background: "var(--surface)", border: "1px solid var(--line)", borderRadius: 10, padding: "8px 12px", fontSize: 11 }}>

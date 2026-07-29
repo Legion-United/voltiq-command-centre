@@ -445,9 +445,26 @@ select.input { appearance: none; cursor: pointer; }
 
 /* ---------- Landing ---------- */
 .landing { min-height: 100vh; background: var(--paper); color: var(--ink); }
-.hero-glow { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
-.hero-glow::before { content: ""; position: absolute; width: 620px; height: 620px; right: -120px; top: -180px; border-radius: 50%; background: radial-gradient(circle, #2f5bff33, transparent 62%); }
-.hero-glow::after { content: ""; position: absolute; width: 480px; height: 480px; left: -140px; bottom: -160px; border-radius: 50%; background: radial-gradient(circle, #d6ff3d44, transparent 60%); }
+.hero-glow {
+  position: absolute; inset: 0; overflow: hidden; pointer-events: none;
+  background:
+    radial-gradient(46% 52% at 84% -6%, color-mix(in srgb, var(--cobalt) 34%, transparent), transparent 60%),
+    radial-gradient(40% 46% at 98% 10%, color-mix(in srgb, #4f6dff 26%, transparent), transparent 58%),
+    radial-gradient(52% 54% at -4% 104%, color-mix(in srgb, var(--cyan) 26%, transparent), transparent 60%),
+    radial-gradient(30% 34% at 14% 86%, color-mix(in srgb, var(--cyan) 20%, transparent), transparent 62%),
+    radial-gradient(36% 42% at 52% 28%, color-mix(in srgb, var(--cobalt) 12%, transparent), transparent 74%);
+}
+.hero-glow::before {
+  content: ""; position: absolute; inset: -35%;
+  background: conic-gradient(from 210deg at 72% 24%, transparent 0 38%, color-mix(in srgb, var(--cyan) 16%, transparent) 52%, transparent 66%);
+  filter: blur(50px); opacity: .7;
+  animation: heroDrift 28s ease-in-out infinite alternate;
+}
+.hero-glow::after {
+  content: ""; position: absolute; inset: 0; opacity: .07; mix-blend-mode: soft-light;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+@keyframes heroDrift { from { transform: translate3d(-2%, -1%, 0) rotate(0deg); } to { transform: translate3d(3%, 1.5%, 0) rotate(10deg); } }
 
 /* ---------- Mobile rail ---------- */
 .railtoggle { display: none; }
@@ -501,7 +518,23 @@ select.input { appearance: none; cursor: pointer; }
   background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px);
   background-size: 44px 44px; opacity: .55;
 }
-.mappin { position: absolute; transform: translate(-50%, -100%); cursor: pointer; }
+.maproads { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
+.maproads path { fill: none; stroke: var(--line-2); stroke-width: 0.5; opacity: .6; }
+.maparea { position: absolute; transform: translate(-50%, -50%); z-index: 2; pointer-events: none;
+  font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase; font-weight: 600; color: var(--faint); opacity: .6; white-space: nowrap; }
+.mappin { position: absolute; transform: translate(-50%, -100%); cursor: pointer; z-index: 3;
+  display: flex; flex-direction: column; align-items: center; gap: 5px; }
+.mappin .cap { display: flex; flex-direction: column; align-items: center; line-height: 1.15;
+  background: color-mix(in srgb, var(--surface) 88%, transparent); border: 1px solid var(--line);
+  border-radius: 8px; padding: 3px 9px; box-shadow: var(--shadow-sm); backdrop-filter: blur(6px);
+  white-space: nowrap; transition: border-color .15s, box-shadow .15s; }
+.mappin .cap b { font-size: 10.5px; font-weight: 700; color: var(--ink); }
+.mappin .cap span { font-size: 9px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.mappin.alert .cap { border-color: color-mix(in srgb, var(--coral) 55%, var(--line)); }
+.mappin.transit .cap span { color: var(--cyan-ink); }
+.mappin.sel { z-index: 5; }
+.mappin.sel .cap { border-color: var(--cobalt); box-shadow: 0 0 0 1px var(--cobalt), var(--shadow); }
+.mappin.sel .glyph { transform: scale(1.08); }
 .mappin .glyph {
   width: 34px; height: 34px; border-radius: 11px 11px 11px 3px; display: grid; place-items: center;
   color: #fff; box-shadow: var(--shadow); border: 2px solid var(--surface); position: relative;

@@ -41,14 +41,14 @@ export type Tech = {
   x: number; y: number; kind: "job" | "transit" | "alert" | "idle"; eta?: string;
 };
 export const techs: Tech[] = [
-  { id: "T1", name: "Marcus Webb", initials: "MW", role: "Senior · Team lead", status: "On job", job: "Office fit-out — 2nd fix", place: "Temple Quay", skills: ["Commercial", "3-phase", "Testing"], util: 92, jobsToday: 3, van: "VN-01", x: 46, y: 38, kind: "job" },
-  { id: "T2", name: "Aisha Khan", initials: "AK", role: "Approved electrician", status: "On job", job: "EICR — retail unit", place: "Cabot Circus", skills: ["EICR", "Retail", "Fire alarm"], util: 88, jobsToday: 4, van: "VN-02", x: 58, y: 30, kind: "job" },
+  { id: "T1", name: "Marcus Webb", initials: "MW", role: "Senior · Team lead", status: "On job", job: "Office fit-out — 2nd fix", place: "Temple Quay", skills: ["Commercial", "3-phase", "Testing"], util: 92, jobsToday: 3, van: "VN-01", x: 50, y: 28, kind: "job" },
+  { id: "T2", name: "Aisha Khan", initials: "AK", role: "Approved electrician", status: "On job", job: "EICR — retail unit", place: "Cabot Circus", skills: ["EICR", "Retail", "Fire alarm"], util: 88, jobsToday: 4, van: "VN-02", x: 71, y: 24, kind: "job" },
   { id: "T3", name: "Liam Doyle", initials: "LD", role: "Approved electrician", status: "Alert", job: "Fault — power loss, whole floor", place: "Redcliffe", skills: ["Fault find", "Commercial"], util: 95, jobsToday: 2, van: "VN-03", x: 52, y: 58, kind: "alert", eta: "on site" },
   { id: "T4", name: "Sofia Marchetti", initials: "SM", role: "Approved electrician", status: "In transit", job: "→ EV charger install", place: "A4 towards Bath", skills: ["EV", "Renewables"], util: 79, jobsToday: 5, van: "VN-04", x: 74, y: 66, kind: "transit", eta: "12 min" },
   { id: "T5", name: "Tom Fisher", initials: "TF", role: "Electrician", status: "On job", job: "Rewire — HMO", place: "Gloucester Rd", skills: ["Domestic", "Rewire"], util: 84, jobsToday: 2, van: "VN-05", x: 40, y: 20, kind: "job" },
   { id: "T6", name: "Grace Bello", initials: "GB", role: "Electrician", status: "On job", job: "Consumer units x3", place: "Knowle", skills: ["Domestic", "Landlord"], util: 81, jobsToday: 4, van: "VN-06", x: 60, y: 74, kind: "job" },
-  { id: "T7", name: "Callum Reid", initials: "CR", role: "Approved electrician", status: "In transit", job: "→ Emergency assist", place: "Redcliffe approach", skills: ["Fault find", "3-phase"], util: 90, jobsToday: 3, van: "VN-07", x: 49, y: 50, kind: "transit", eta: "6 min" },
-  { id: "T8", name: "Nadia Osei", initials: "NO", role: "Apprentice (Yr 3)", status: "On job", job: "Assisting — office fit-out", place: "Temple Quay", skills: ["Domestic", "Testing"], util: 76, jobsToday: 3, van: "VN-01", x: 44, y: 40, kind: "job" },
+  { id: "T7", name: "Callum Reid", initials: "CR", role: "Approved electrician", status: "In transit", job: "→ Emergency assist", place: "Redcliffe approach", skills: ["Fault find", "3-phase"], util: 90, jobsToday: 3, van: "VN-07", x: 42, y: 52, kind: "transit", eta: "6 min" },
+  { id: "T8", name: "Nadia Osei", initials: "NO", role: "Apprentice (Yr 3)", status: "On job", job: "Assisting — office fit-out", place: "Temple Quay", skills: ["Domestic", "Testing"], util: 76, jobsToday: 3, van: "VN-01", x: 37, y: 43, kind: "job" },
   { id: "T9", name: "Ben Sutcliffe", initials: "BS", role: "Electrician", status: "Idle", job: "Between jobs", place: "Depot — Bedminster", skills: ["Domestic", "Solar"], util: 62, jobsToday: 2, van: "VN-08", x: 34, y: 78, kind: "idle" },
 ];
 

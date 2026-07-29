@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import DashShell from "@/components/DashShell";
+import BootScreen from "@/components/BootScreen";
 
 export const metadata: Metadata = {
   title: "Voltiq · Electrical Command Centre",
@@ -20,6 +21,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
       </head>
       <body>
+        <BootScreen />
         <DashShell>{children}</DashShell>
       </body>
     </html>
