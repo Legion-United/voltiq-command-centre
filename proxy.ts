@@ -69,7 +69,7 @@ async function signSession(email: string, secret: string): Promise<string> {
 }
 
 export async function proxy(req: NextRequest) {
-  const secret = process.env.DEMO_SESSION_SECRET || "";
+  const secret = process.env.DEMO_HUB_SECRET_V2 || "";
 
   // Not configured yet -> stay open so nothing breaks. Gate activates once the
   // shared secret is set on this project.
