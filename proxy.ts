@@ -11,7 +11,7 @@ import { NextRequest, NextResponse } from "next/server";
 // open (no regression); the gate switches on the moment the secret is present.
 const COOKIE = "lu_session";
 const PARAM = "lu_access";
-const HUB = "https://demo-hub-snowy.vercel.app";
+const HUB = "https://demo.legion-united.com";
 const DAY = 86400;
 
 function b64urlToBytes(str: string): Uint8Array<ArrayBuffer> {
