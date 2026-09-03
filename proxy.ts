@@ -14,6 +14,9 @@ const COOKIE = "lu_session";
 const PARAM = "lu_access";
 const HUB = "https://demo.legion-united.com";
 const DAY = 86400;
+// The hub signs every access grant for exactly one demo (payload.d). A grant
+// minted for another demo must not open this one.
+const DEMO_SLUG = "electrical-team";
 
 function b64urlToBytes(str: string): Uint8Array<ArrayBuffer> {
   let s = str.replace(/-/g, "+").replace(/_/g, "/");
@@ -54,7 +57,8 @@ async function verifyToken(token: string | undefined, secret: string): Promise<a
     );
     if (!ok) return null;
     const payload = JSON.parse(new TextDecoder().decode(b64urlToBytes(body)));
-    if (payload.x && Math.floor(Date.now() / 1000) > payload.x) return null;
+    const now = Math.floor(Date.now() / 1000);
+    if (typeof payload.x !== "number" || now > payload.x) return null;
     return payload;
   } catch {
     return null;
@@ -83,7 +87,7 @@ export async function proxy(req: NextRequest) {
   const access = url.searchParams.get(PARAM);
   if (access) {
     const grant = await verifyToken(access, secret);
-    if (grant && grant.p === "access" && grant.e) {
+    if (grant && grant.p === "access" && grant.e && grant.d === DEMO_SLUG) {
       const clean = url.clone();
       clean.searchParams.delete(PARAM);
       const res = NextResponse.redirect(clean);
