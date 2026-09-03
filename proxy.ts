@@ -7,8 +7,9 @@ import { NextRequest, NextResponse } from "next/server";
 // visitor is sent back to the hub gate. Token contract matches the hub's
 // api/_lib/token.js exactly (HMAC-SHA256 over base64url(payload)).
 //
-// Open-until-configured: while DEMO_SESSION_SECRET is unset the demo stays fully
-// open (no regression); the gate switches on the moment the secret is present.
+// Fail-closed: while DEMO_HUB_SECRET_V2 is unset every request is sent back to
+// the hub (same behaviour as the v1 demos). Set the secret for Production AND
+// Preview.
 const COOKIE = "lu_session";
 const PARAM = "lu_access";
 const HUB = "https://demo.legion-united.com";
@@ -71,9 +72,9 @@ async function signSession(email: string, secret: string): Promise<string> {
 export async function proxy(req: NextRequest) {
   const secret = process.env.DEMO_HUB_SECRET_V2 || "";
 
-  // Not configured yet -> stay open so nothing breaks. Gate activates once the
-  // shared secret is set on this project.
-  if (!secret) return NextResponse.next();
+  // Fail closed: without the shared secret nobody gets in (verifyToken returns
+  // null for an empty secret, so the request falls through to the hub redirect).
+  if (!secret) console.error("DEMO_HUB_SECRET_V2 is not set; gate is closed");
 
   const session = await verifyToken(req.cookies.get(COOKIE)?.value, secret);
   if (session && session.p === "session") return NextResponse.next();
